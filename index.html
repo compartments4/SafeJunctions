@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Demo: Add points to a web map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+
+      /* Default Toggle button */
+      #toggle-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            background-color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+       /* Default cursor style */
+       #map {
+        cursor: default;
+      }
+      
+      /* Arrow cursor style */
+      .mapboxgl-canvas {
+        cursor: default; /* Arrow pointer for default behavior */
+      }
+      
+      .mapboxgl-canvas-pointer {
+        cursor: pointer; /* Hand pointer when interacting with features */
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <button id="toggle-button">Dark</button>
+
+    <div id="map"></div>
+    <script>
+
+      //access token
+      mapboxgl.accessToken = 'pk.eyJ1Ijoic3R1ZGlvdXJiYW4iLCJhIjoiY2x3cTIwcG83MWtxYjJrbnh3YnIzdHF1YSJ9.G_vrrjKBmzTTYlJ0tgjrBw';
+
+      //map division
+      var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/studiourban/clwq2ijor010h01ny226ydlf6',
+        center: [77.613, 12.975],
+        zoom: 10.7
+      });
+        
+      
+          // Toggle button element
+        var toggleButton = document.getElementById('toggle-button');
+
+          // Track current mode
+        var isLightMode = true;
+
+          // Toggle function
+        toggleButton.onclick = function () {
+      if (isLightMode) {
+        map.setStyle('mapbox://styles/studiourban/clwq2ijor010h01ny226ydlf6'); // Switch to dark mode
+        toggleButton.textContent = 'Light';
+      } else {
+        map.setStyle('mapbox://styles/mapbox/light-v10'); // Switch to light mode
+        toggleButton.textContent = 'Dark';
+       }
+      isLightMode = !isLightMode;
+      };
+
+      
+      // Set cursor style for specific layer interaction
+        map.on('load', () => {
+        map.on('mouseenter', 'Suraksha 75', () => {
+          map.getCanvas().classList.add('mapboxgl-canvas-pointer');
+        });
+        map.on('mouseenter', 'Ongoing Junctions', () => {
+          map.getCanvas().classList.add('mapboxgl-canvas-pointer');
+        });
+        map.on('mouseenter', 'Prospective Locations', () => {
+          map.getCanvas().classList.add('mapboxgl-canvas-pointer');
+        });
+
+        map.on('mouseleave', 'Suraksha 75', () => {
+          map.getCanvas().classList.remove('mapboxgl-canvas-pointer');
+        });
+        map.on('mouseleave', 'Ongoing Junctions', () => {
+          map.getCanvas().classList.remove('mapboxgl-canvas-pointer');
+        });
+        map.on('mouseleave', 'Propsective Locations', () => {
+          map.getCanvas().classList.remove('mapboxgl-canvas-pointer');
+        });
+      });
+      
+      //Suraksha 75
+      map.on('click', (event) => {
+        const features = map.queryRenderedFeatures(event.point, {layers: ['Suraksha 75']});
+        if (!features.length) {
+          return;
+        }
+        const feature = features[0];
+
+        const popup = new mapboxgl.Popup({ offset: [0, -15] })
+          .setLngLat(feature.geometry.coordinates)
+          .setHTML(
+            `<h3>${feature.properties.Name}</h3><p>${feature.properties.Agency}</p>`
+          )
+          .addTo(map);
+      });
+
+      //Ongoing Junctions
+      map.on('click', (event) => {
+        const features = map.queryRenderedFeatures(event.point, {layers: ['Ongoing Junctions']});
+        if (!features.length) {
+          return;
+        }
+        const feature = features[0];
+
+        const popup = new mapboxgl.Popup({ offset: [0, -15] })
+          .setLngLat(feature.geometry.coordinates)
+          .setHTML(
+            `<h3>${feature.properties.Name}</h3><p>${feature.properties.Agency}</p><p>${feature.properties.Status}</p>`
+          )
+          .addTo(map);
+      });
+
+      //Propsective Junctions
+      map.on('click', (event) => {
+        const features = map.queryRenderedFeatures(event.point, {layers: ['Prospective Locations']});
+        if (!features.length) {
+          return;
+        }
+        const feature = features[0];
+
+        const popup = new mapboxgl.Popup({ offset: [0, -15] })
+          .setLngLat(feature.geometry.coordinates)
+          .setHTML(
+            `<h3>${feature.properties.Name}</h3><p>${feature.properties.QueueLeng}</p>`
+          )
+          .addTo(map);
+      });
+
+    </script>
+  </body>
+
+  
+</html>
